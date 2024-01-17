@@ -16,6 +16,9 @@ input_data = torch.rand(20)  # Replace with real data
 print("sample data:", input_data)
 """
 
+print("input coefficient data from the hamiltonian:", inputs)
+
+
 
 # Encode the input data
 encoded_params = encoder(inputs)
