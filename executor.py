@@ -4,14 +4,21 @@ import torch
 from classical_encoder import encoder
 from QuantumCircuit import run_quantum_circuit
 from classical_decoder import decoder
+from qiskit_nature.second_q.drivers import PySCFDriver
+
+from hamiltonian import inputs
 
 
+
+"""
 # Sample input data
 input_data = torch.rand(20)  # Replace with real data
 print("sample data:", input_data)
+"""
+
 
 # Encode the input data
-encoded_params = encoder(input_data)
+encoded_params = encoder(inputs)
 print("The encoded parameters are: ", encoded_params)
 
 

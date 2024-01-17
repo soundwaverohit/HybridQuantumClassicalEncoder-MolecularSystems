@@ -8,7 +8,7 @@ class ClassicalDecoder(nn.Module):
         self.fc = nn.Sequential(
             nn.Linear(4, 10),   # First layer with 4 inputs and 10 outputs
             nn.ReLU(),          # Activation function
-            nn.Linear(10, 20)   # Second layer with 10 inputs and 20 outputs
+            nn.Linear(10, 36)   # Second layer with 10 inputs and 20 outputs
         )
     
     def forward(self, x):
