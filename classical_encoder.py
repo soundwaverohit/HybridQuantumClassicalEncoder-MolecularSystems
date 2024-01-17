@@ -17,3 +17,4 @@ class ClassicalEncoder(nn.Module):
         return self.fc(x)
 
 encoder = ClassicalEncoder()
+print("The encoder is: ", encoder)
