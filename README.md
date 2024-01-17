@@ -7,7 +7,7 @@
 
 
 ### Sample output of executor.py is:
-
+"""
 The encoder is:  ClassicalEncoder(
   (fc): Sequential(
     (0): Linear(in_features=20, out_features=10, bias=True)
@@ -42,3 +42,7 @@ The final output after decoding is:
 tensor([-0.1289,  0.0707, -0.2629, -0.1154, -0.0138,  0.1901, -0.2963, -0.0606,
          0.1109,  0.2114,  0.1229,  0.2007, -0.2612, -0.3134,  0.1790,  0.0500,
         -0.2665, -0.2011,  0.0246, -0.0380], grad_fn=<ViewBackward0>)
+
+
+"""
+
