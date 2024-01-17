@@ -1,5 +1,5 @@
 from qiskit import QuantumCircuit, Aer, execute
-from qiskit.visualization import plot_histogram
+from qiskit.visualization import plot_histogram, circuit_drawer
 from qiskit.circuit import Parameter
 import numpy as np
 import torch 
@@ -17,15 +17,21 @@ def run_quantum_circuit(params):
         qc.rx(theta[i], i)
         qc.measure(i, i)
     
-    # Bind the parameters and execute the circuit
-    backend = Aer.get_backend('qasm_simulator')
-    t_params = {theta[i]: params[i].item() for i in range(4)}
-    circuit = qc.bind_parameters(t_params)
+    # Bind the parameters to the values from the PyTorch model
+    param_dict = {theta[i]: params[i].item() for i in range(4)}
+    qc_bound = qc.bind_parameters(param_dict)
     
+    # Print the quantum circuit
+    print(qc_bound)
+
+    # If you want a visual diagram of the circuit, you can use:
+    # circuit_drawer(qc_bound, output='mpl').show()
+
     # Execute the quantum circuit
-    job = execute(circuit, backend, shots=1024)
+    backend = Aer.get_backend('qasm_simulator')
+    job = execute(qc_bound, backend, shots=1024)
     result = job.result()
-    counts = result.get_counts(circuit)
+    counts = result.get_counts(qc_bound)
     
     # Plot the histogram of results
     plot_histogram(counts)
@@ -40,3 +46,6 @@ def run_quantum_circuit(params):
     output_tensor = torch.tensor(output_data, dtype=torch.float32)
     
     return output_tensor
+
+# Example usage
+
