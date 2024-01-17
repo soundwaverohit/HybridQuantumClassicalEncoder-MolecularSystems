@@ -6,7 +6,7 @@ from QuantumCircuit import run_quantum_circuit
 from classical_decoder import decoder
 from qiskit_nature.second_q.drivers import PySCFDriver
 
-from hamiltonian import inputs
+from hamiltonian_initial import inputs
 
 
 

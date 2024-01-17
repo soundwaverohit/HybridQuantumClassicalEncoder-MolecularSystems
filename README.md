@@ -1,6 +1,11 @@
 # HybridQuantumClassicalEncoder-MolecularSystems
 
 
+#### TODO
+- Look at the correct hamiltonian coefficient changes and where to implement them 
+- Have the hamiltonian to find the correct ground state with the correct parameters and the quantum encoder version to find the difference 
+
+
 ## Proposed packages for pipeline: 
 - Qiskit for Quantum Circuits
 - Pytorch for the Neural Networks
