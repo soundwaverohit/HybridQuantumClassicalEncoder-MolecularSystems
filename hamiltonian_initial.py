@@ -46,7 +46,32 @@ wavefunction_value = slater_determinant(r)
 print("Wavefunction value at r =", r, ":", wavefunction_value)
 
 
+def generate_random_wavefunction(size):
+    # Generate a random complex vector
+    real_part = np.random.normal(0, 1, size)
+    imag_part = np.random.normal(0, 1, size)
+    wavefunction = real_part + 1j * imag_part
 
+    # Normalize the wavefunction
+    norm = np.sqrt(np.sum(np.abs(wavefunction)**2))
+    normalized_wavefunction = wavefunction / norm
+
+    return normalized_wavefunction
+
+# Define the size of the wavefunction (number of elements)
+# This should match the size of your Hamiltonian matrix
+wavefunction_size = 7  # Example size, adjust as needed
+
+# Generate the random wavefunction
+random_wavefunction = generate_random_wavefunction(wavefunction_size)
+
+# Convert to a PyTorch tensor
+inputs = torch.tensor(random_wavefunction, dtype=torch.cfloat)
+
+inputs= inputs.real
+print(inputs)
+
+"""
 # Convert the Hamiltonian matrix to a 1D tensor
 # Flatten the matrix and ensure it's a real number tensor (if needed)
 hamiltonian_coefficients = torch.tensor(h_core.flatten(), dtype=torch.float32)
@@ -54,3 +79,4 @@ hamiltonian_coefficients = torch.tensor(h_core.flatten(), dtype=torch.float32)
 # Now, hamiltonian_coefficients contains the Hamiltonian matrix coefficients
 inputs= hamiltonian_coefficients
 print("Hamiltonian coefficients are: ", inputs)
+"""
