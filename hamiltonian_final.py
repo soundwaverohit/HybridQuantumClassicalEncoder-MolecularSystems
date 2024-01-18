@@ -32,7 +32,7 @@ assert H_complex.shape[0] == norm_wavefunction.shape[0], "Size mismatch between 
 
 # Calculate the energy expectation value
 energy = torch.vdot(norm_wavefunction, torch.mv(H_complex, norm_wavefunction)).real
-print("Energy ", energy)
+print("Energy found by the hybrid quantum-classical autoencoder: ", energy)
 
 
 print("True ground state of water: ", )
