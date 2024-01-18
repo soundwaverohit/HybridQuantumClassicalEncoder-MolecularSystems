@@ -4,8 +4,11 @@ import numpy as np
 
 # Define the molecule
 # Example: Hydrogen molecule
-mol = gto.M(atom='H 0 0 0; H 0 0 0.735', basis='sto-3g')
-
+mol = gto.M(atom=[
+    ['O', (0.0, 0.0, 0.0)],          # Oxygen at origin
+    ['H', (0.0, -0.757, 0.587)],     # Hydrogen 1
+    ['H', (0.0, 0.757, 0.587)]       # Hydrogen 2
+], basis='sto-3g')
 # Perform Hartree-Fock calculation to get the molecular orbitals
 mf = scf.RHF(mol)
 mf.kernel()
@@ -15,7 +18,7 @@ h_core = mf.get_hcore()
 
 # The molecular orbital coefficients
 mo_coeff = mf.mo_coeff
-print("Molecular orbitial coefficients: ", mo_coeff)
+##print("Molecular orbitial coefficients: ", mo_coeff)
 
 # The molecular orbital occupation numbers
 mo_occ = mf.mo_occ
@@ -24,7 +27,7 @@ print("Molecular orbital occupation numbers: ", mo_occ)
 
 # Number of electrons
 nelec = mol.nelectron
-print("Number of electrons: ", nelec)
+#rint("Number of electrons: ", nelec)
 
 # For the H2 molecule in its ground state, we consider the first two orbitals (1s orbitals for each hydrogen atom)
 def slater_determinant(r):
@@ -42,8 +45,8 @@ def slater_determinant(r):
 
 # Example: Evaluate the wavefunction at a specific point
 r = np.array([[0.0, 0.0, 0.0]])  # Position to evaluate the wavefunction
-wavefunction_value = slater_determinant(r)
-print("Wavefunction value at r =", r, ":", wavefunction_value)
+#wavefunction_value = slater_determinant(r)
+#print("Wavefunction value at r =", r, ":", wavefunction_value)
 
 
 def generate_random_wavefunction(size):
