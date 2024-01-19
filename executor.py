@@ -6,7 +6,7 @@ from QuantumCircuit import run_quantum_circuit
 from classical_decoder import decoder
 from qiskit_nature.second_q.drivers import PySCFDriver
 
-from hamiltonian_initial import inputs
+#from hamiltonian_initial import inputs
 
 
 
@@ -16,6 +16,7 @@ input_data = torch.rand(20)  # Replace with real data
 print("sample data:", input_data)
 """
 
+inputs= torch.tensor([ 0.3679, -0.0602,  0.6200,  0.1083, -0.0054,  0.0107,  0.1241])
 print("input coefficient data from the hamiltonian:", inputs)
 
 

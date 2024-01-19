@@ -63,16 +63,7 @@ def generate_random_wavefunction(size):
 
 # Define the size of the wavefunction (number of elements)
 # This should match the size of your Hamiltonian matrix
-wavefunction_size = 7  # Example size, adjust as needed
 
-# Generate the random wavefunction
-random_wavefunction = generate_random_wavefunction(wavefunction_size)
-
-# Convert to a PyTorch tensor
-inputs = torch.tensor(random_wavefunction, dtype=torch.cfloat)
-
-inputs= inputs.real
-print(inputs)
 
 """
 # Convert the Hamiltonian matrix to a 1D tensor
