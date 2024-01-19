@@ -10,12 +10,48 @@ def run_quantum_circuit(params):
     theta = [Parameter(f'θ{i}') for i in range(4)]
     
     # Create a quantum circuit with 4 qubits and 4 classical bits
-    qc = QuantumCircuit(4, 4)
+    qc = QuantumCircuit(4)
     
-    # Add parameterized rotations and a measurement to each qubit
+    # Apply initial Ry and Rx rotations
+    for i in range(4):
+        qc.ry(theta[i], i)
+        qc.rx(theta[i], i)
+
+    qc.cnot(3,0)
+    qc.cnot(1,0)
+    qc.cnot(2,1)
+    qc.cnot(3,2)
+
+    qc.barrier()
+
     for i in range(4):
         qc.rx(theta[i], i)
-        qc.measure(i, i)
+        qc.ry(theta[i], i)
+        qc.rx(theta[i], i)
+
+    qc.cnot(3,0)
+    qc.cnot(1,0)
+    qc.cnot(2,1)
+    qc.cnot(3,2)
+
+    qc.barrier()
+
+    for i in range(4):
+        qc.rx(theta[i], i)
+        qc.ry(theta[i], i)
+        qc.rx(theta[i], i)
+
+    qc.cnot(3,0)
+    qc.cnot(1,0)
+    qc.cnot(2,1)
+    qc.cnot(3,2)
+
+    qc.barrier()
+    
+    
+
+    # Add measurements to all qubits
+    qc.measure_all()
     
     # Bind the parameters to the values from the PyTorch model
     param_dict = {theta[i]: params[i].item() for i in range(4)}
@@ -46,6 +82,3 @@ def run_quantum_circuit(params):
     output_tensor = torch.tensor(output_data, dtype=torch.float32)
     
     return output_tensor
-
-# Example usage
-
