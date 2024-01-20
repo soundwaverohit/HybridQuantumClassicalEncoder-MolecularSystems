@@ -58,7 +58,7 @@ def run_quantum_circuit(params):
     qc_bound = qc.bind_parameters(param_dict)
     
     # Print the quantum circuit
-    print(qc_bound)
+    #print(qc_bound)
 
     # If you want a visual diagram of the circuit, you can use:
     # circuit_drawer(qc_bound, output='mpl').show()

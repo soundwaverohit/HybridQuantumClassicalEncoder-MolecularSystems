@@ -23,4 +23,4 @@ class ClassicalDecoder(nn.Module):
         return self.fc(x)
 
 decoder = ClassicalDecoder()
-print("The decoder is: ", decoder)
+#print("The decoder is: ", decoder)

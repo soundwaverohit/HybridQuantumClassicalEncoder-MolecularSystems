@@ -23,8 +23,6 @@ file_paths = [
     "classical_encoder.py",
     "classical_decoder.py",
     "QuantumCircuit.py",
-    "hamiltonian_initial.py",
-    "hamiltonian_final.py"
 ]
 
 # Read file contents
@@ -37,8 +35,6 @@ for file_path in file_paths:
 classical_encoder_module = create_module("classical_encoder", file_contents["classical_encoder.py"])
 classical_decoder_module = create_module("classical_decoder", file_contents["classical_decoder.py"])
 quantum_circuit_module = create_module("QuantumCircuit", file_contents["QuantumCircuit.py"])
-hamiltonian_initial_module = create_module("hamiltonian_initial", file_contents["hamiltonian_initial.py"])
-hamiltonian_final_module = create_module("hamiltonian_final", file_contents["hamiltonian_final.py"])
 
 # Define the hybrid model
 class HybridModel(nn.Module):
@@ -109,9 +105,9 @@ for epoch in range(num_epochs):
         raise RuntimeError("Output does not require gradients. Check model implementation.")
 
     # Calculate the loss
-    initial_hamiltonian = hamiltonian_initial_module.mf.get_hcore()
-    final_hamiltonian = hamiltonian_final_module.mf.get_hcore()
-    loss = abs(energy_expectation(output, final_hamiltonian) - abs(-74.9630631297277)) / abs(-74.9630631297277)
+    #initial_hamiltonian = hamiltonian_initial_module.mf.get_hcore()
+    #final_hamiltonian = hamiltonian_final_module.mf.get_hcore()
+    loss = abs(abs(energy_expectation(output, mf.get_hcore())) - abs(-74.9630631297277)) / abs(-74.9630631297277)
 
     # Check if loss requires grad
     if not loss.requires_grad:
@@ -121,5 +117,3 @@ for epoch in range(num_epochs):
     optimizer.step()                 # Update parameters
     loss_values.append(loss.item())  # Store loss for plotting
     print(f"Epoch {epoch+1}/{num_epochs}, Loss: {loss.item()}")
-
-
