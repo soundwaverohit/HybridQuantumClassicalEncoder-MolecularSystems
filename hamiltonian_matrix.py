@@ -51,3 +51,13 @@ for i in range(num_orbitals):
                 
 #print(H_spin)
 print(len(H_spin))
+
+import numpy as np
+
+# Assume H_spin is already defined as your 14x14 Hamiltonian matrix
+# Diagonalize the Hamiltonian matrix
+eigenvalues, eigenvectors = np.linalg.eigh(H_spin)
+
+# eigenvalues contains the energy levels
+# eigenvectors contains the corresponding quantum states
+print(min(eigenvalues))
