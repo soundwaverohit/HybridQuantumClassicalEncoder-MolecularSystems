@@ -1,5 +1,4 @@
 from executor import decoded_output
-from qiskit_nature.second_q.drivers import PySCFDriver
 import torch
 from pyscf import gto, scf
 import numpy as np

@@ -1,10 +1,8 @@
 """This is the file to execute the hybrid file"""
 import torch
-
 from classical_encoder import encoder
 from QuantumCircuit import run_quantum_circuit
 from classical_decoder import decoder
-from qiskit_nature.second_q.drivers import PySCFDriver
 
 #from hamiltonian_initial import inputs
 

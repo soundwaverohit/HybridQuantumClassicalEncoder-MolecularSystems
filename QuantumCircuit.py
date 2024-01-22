@@ -1,5 +1,5 @@
 from qiskit import QuantumCircuit, Aer, execute
-from qiskit.visualization import plot_histogram, circuit_drawer
+from qiskit.visualization import plot_histogram
 from qiskit.circuit import Parameter
 import numpy as np
 import torch 

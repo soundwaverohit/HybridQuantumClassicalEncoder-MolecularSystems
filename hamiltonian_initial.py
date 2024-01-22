@@ -1,5 +1,4 @@
 from pyscf import gto, scf
-import torch
 import numpy as np
 
 # Define the molecule

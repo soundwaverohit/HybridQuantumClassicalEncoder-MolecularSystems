@@ -1,4 +1,3 @@
-import torch
 import torch.nn as nn
 
 # Define the classical decoder neural network

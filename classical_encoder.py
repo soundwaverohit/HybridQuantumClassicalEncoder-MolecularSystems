@@ -1,6 +1,5 @@
 """This code is a sample pipeline approach we shall be tweaking it further"""
 
-import torch
 import torch.nn as nn
 
 # Define the classical encoder neural network
