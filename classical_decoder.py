@@ -11,11 +11,11 @@ class ClassicalDecoder(nn.Module):
             nn.ReLU(),          # Activation function
             nn.Linear(16, 32),  # Third layer with 16 inputs and 32 outputs
             nn.ReLU(),          # Activation function
-            nn.Linear(32, 16),  # Fourth layer reducing from 32 to 16 outputs
+            nn.Linear(32, 64),
+            nn.ReLU(),
+            nn.Linear(64, 32),  # Fourth layer reducing from 32 to 16 outputs
             nn.ReLU(),          # Activation function
-            nn.Linear(16, 8),   # Fifth layer reducing from 16 to 8 outputs
-            nn.ReLU(),          # Activation function
-            nn.Linear(8, 7)     # Final layer reducing to 7 outputs to match the original input size
+            nn.Linear(32, 14)
         )
     
     def forward(self, x):

@@ -5,6 +5,8 @@ import numpy as np
 from classical_encoder import ClassicalEncoder
 from classical_decoder import ClassicalDecoder
 from QuantumCircuit import run_quantum_circuit
+from hamiltonian_matrix import H_spin
+
 
 class HybridModel(nn.Module):
     def __init__(self):
@@ -51,7 +53,7 @@ def energy_expectation(output, hamiltonian):
 
 # Sample input
 #input_data = torch.rand(7, requires_grad=True)  # Example input
-input_data= torch.tensor([ 0.3679, -0.0602,  0.6200,  0.1083, -0.0054,  0.0107,  0.1241])
+input_data= torch.tensor([ 0.3679, -0.0602,  0.6200,  0.1083, -0.0054,  0.0107,  0.1241, 0.3679, -0.0602,  0.6200,  0.1083, -0.0054,  0.0107,  0.1241])
 
 # Optimization setup
 #print("The model parameters are: ", model.parameters)
@@ -78,7 +80,7 @@ for epoch in range(num_epochs):
     # Calculate the loss
     #initial_hamiltonian = hamiltonian_initial_module.mf.get_hcore()
     #final_hamiltonian = hamiltonian_final_module.mf.get_hcore()
-    loss = energy_expectation(output, mf.get_hcore())
+    loss = energy_expectation(output,H_spin)
     # Check if loss requires grad
     if not loss.requires_grad:
         raise RuntimeError("Loss does not require gradients. Check energy_expectation implementation.")
