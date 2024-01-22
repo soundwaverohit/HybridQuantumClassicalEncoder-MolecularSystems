@@ -33,8 +33,8 @@ def energy_expectation(output, hamiltonian):
     H_complex = torch.tensor(hamiltonian, dtype=torch.cfloat).real
 
     wavefunction = output  # Assuming this is a complex tensor
-    wavefunction_np = wavefunction.detach().numpy()
-    expectation_value = np.dot(wavefunction_np, np.dot(hamiltonian, wavefunction_np))
+    #wavefunction_np = wavefunction.detach().numpy()
+    #expectation_value = np.dot(wavefunction_np, np.dot(hamiltonian, wavefunction_np))
 
     # Normalize the wavefunction
     norm_wavefunction = wavefunction / torch.sqrt(torch.sum(torch.abs(wavefunction)**2))
@@ -78,8 +78,7 @@ for epoch in range(num_epochs):
     # Calculate the loss
     #initial_hamiltonian = hamiltonian_initial_module.mf.get_hcore()
     #final_hamiltonian = hamiltonian_final_module.mf.get_hcore()
-    loss = abs(abs(energy_expectation(output, mf.get_hcore())) - abs(-74.9630631297277)) / abs(-74.9630631297277)
-
+    loss = energy_expectation(output, mf.get_hcore())
     # Check if loss requires grad
     if not loss.requires_grad:
         raise RuntimeError("Loss does not require gradients. Check energy_expectation implementation.")
