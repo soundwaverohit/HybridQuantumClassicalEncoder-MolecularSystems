@@ -2,44 +2,16 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
-import types
-import sys
+from classical_encoder import ClassicalEncoder
+from classical_decoder import ClassicalDecoder
+from QuantumCircuit import run_quantum_circuit
 
-# Importing the contents of the files as modules
-# This involves dynamically creating modules from the file contents
-
-# Helper function to create a module from file content
-def create_module(file_name, content):
-    module = types.ModuleType(file_name)
-    exec(content, module.__dict__)
-    sys.modules[file_name] = module
-    return module
-
-# Define file paths
-file_paths = [
-    "classical_encoder.py",
-    "classical_decoder.py",
-    "QuantumCircuit.py",
-]
-
-# Read file contents
-file_contents = {}
-for file_path in file_paths:
-    with open(file_path, 'r') as file:
-        file_contents[file_path] = file.read()
-
-# Creating modules from the provided files
-classical_encoder_module = create_module("classical_encoder", file_contents["classical_encoder.py"])
-classical_decoder_module = create_module("classical_decoder", file_contents["classical_decoder.py"])
-quantum_circuit_module = create_module("QuantumCircuit", file_contents["QuantumCircuit.py"])
-
-# Define the hybrid model
 class HybridModel(nn.Module):
     def __init__(self):
         super(HybridModel, self).__init__()
-        self.encoder = classical_encoder_module.ClassicalEncoder()
-        self.decoder = classical_decoder_module.ClassicalDecoder()
-        self.qcircuit = quantum_circuit_module.run_quantum_circuit
+        self.encoder = ClassicalEncoder()
+        self.decoder = ClassicalDecoder()
+        self.qcircuit = run_quantum_circuit
 
     def forward(self, x):
         encoded = self.encoder(x)
@@ -78,9 +50,11 @@ def energy_expectation(output, hamiltonian):
     return energy #torch.tensor([0.0], requires_grad=True)  # Example placeholder
 
 # Sample input
-input_data = torch.rand(7, requires_grad=True)  # Example input
+#input_data = torch.rand(7, requires_grad=True)  # Example input
+input_data= torch.tensor([ 0.3679, -0.0602,  0.6200,  0.1083, -0.0054,  0.0107,  0.1241])
 
 # Optimization setup
+#print("The model parameters are: ", model.parameters)
 optimizer = optim.Adam(model.parameters(), lr=0.01)
 num_epochs = 200
 loss_values = []
