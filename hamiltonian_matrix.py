@@ -2,80 +2,72 @@ from pyscf import gto, scf
 import numpy as np
 import scipy.sparse as sp
 
-
+# Step 1: Define the Molecular System
+# A water molecule is defined using PySCF's `gto.M` function.
 mol = gto.M(atom=[
     ['O', (0.0, 0.0, 0.0)],          # Oxygen at origin
     ['H', (0.0, -0.757, 0.587)],     # Hydrogen 1
     ['H', (0.0, 0.757, 0.587)]       # Hydrogen 2
 ], basis='sto-3g')
 
-# Perform Hartree-Fock calculation
+# Step 2: Perform Hartree-Fock Calculation
+# A restricted Hartree-Fock (RHF) calculation is performed on the molecule.
 mf = scf.RHF(mol)
 mf.kernel()
 
-# Get MO coefficients and integrals
+# Step 3: Obtain Molecular Orbitals Coefficients and Integrals
+# `mo_coeff` stores the molecular orbital coefficients.
+# `h1` is the core Hamiltonian matrix, containing kinetic energy and nuclear attraction integrals.
+# `g2` contains the two-electron repulsion integrals over atomic orbitals.
 mo_coeff = mf.mo_coeff
 h1 = mf.get_hcore(mol)
 g2 = mol.intor('int2e', aosym='s1')
 
-# Transform g2 to MO basis
+# Step 4: Transform Two-Electron Integrals to MO Basis
+# The two-electron integrals `g2` are transformed to the molecular orbital (MO) basis.
 g2_mo = np.einsum('pqrs,pi,qj,rk,sl->ijkl', g2, mo_coeff, mo_coeff, mo_coeff, mo_coeff)
 
-# Construct the Hamiltonian matrix in MO basis
+# Step 5: Construct Hamiltonian in MO Basis
+# A Hamiltonian matrix `H` is initialized with zeros.
 num_orbitals = mo_coeff.shape[1]
 H = np.zeros((num_orbitals, num_orbitals))
 
-# Add one-electron integrals
+# Add the one-electron integrals (`h1`) to `H`.
 for i in range(num_orbitals):
     for j in range(num_orbitals):
         H[i, j] += h1[i, j]
 
-# Add two-electron integrals
+# Step 6: Add Two-Electron Integrals
+# This nested loop adds the two-electron integrals to the Hamiltonian matrix.
 for i in range(num_orbitals):
     for j in range(num_orbitals):
         for k in range(num_orbitals):
             for l in range(num_orbitals):
                 H[i, j] += 0.5 * g2_mo[i, j, k, l] * ((k == l) - 0.5 * (i == l) * (j == k))
 
-num_spin_orbitals = 2 * num_orbitals  # Double the number of orbitals for spin
+# Step 7: Account for Spin Orbitals
+# The Hamiltonian matrix is expanded to include spin orbitals.
+num_spin_orbitals = 2 * num_orbitals
 H_spin = np.zeros((num_spin_orbitals, num_spin_orbitals))
 
-# Fill in the Hamiltonian matrix for spin orbitals
+# Each element of the original Hamiltonian is replicated in both the alpha and beta spin blocks.
 for i in range(num_orbitals):
     for j in range(num_orbitals):
-        # Alpha spin block
         H_spin[i, j] = H[i, j]
-        # Beta spin block
         H_spin[i + num_orbitals, j + num_orbitals] = H[i, j]
-# The Hamiltonian matrix 'H' is now constructed
-                
-#print(H_spin)
-print(len(H_spin))
 
-import numpy as np
-
-# Assume H_spin is already defined as your 14x14 Hamiltonian matrix
-# Diagonalize the Hamiltonian matrix
-eigenvalues, eigenvectors = np.linalg.eigh(H_spin)
-
-# eigenvalues contains the energy levels
-# eigenvectors contains the corresponding quantum states
-print("for the small 14x14 matrix: ", min(eigenvalues))
-
-
-
-# Convert H_spin to a sparse matrix
+# Step 8: Scale Up to a Larger Sparse Matrix
+# The Hamiltonian matrix is converted into a sparse matrix format.
 H_spin_sparse = sp.csr_matrix(H_spin)
 
+# A much larger sparse matrix (`large_H_spin_sparse`) is created.
 size = 2**14
-
-# Create an empty sparse matrix of the desired size
 large_H_spin_sparse = sp.lil_matrix((size, size))
 
-# Calculate the number of repetitions needed
+# Calculate the number of repetitions needed.
 repetitions = size // H_spin_sparse.shape[0]
 
-# Populate the large sparse matrix with the pattern from H_spin
+# Populate the large sparse matrix with the pattern from `H_spin_sparse`.
 for i in range(repetitions):
     for j in range(repetitions):
         start_row = i * H_spin_sparse.shape[0]
@@ -84,8 +76,17 @@ for i in range(repetitions):
         end_col = start_col + H_spin_sparse.shape[1]
         large_H_spin_sparse[start_row:end_row, start_col:end_col] = H_spin_sparse
 
-# Convert to CSR format for efficient arithmetic and matrix-vector operations
+# Convert to CSR format for efficient arithmetic and matrix-vector operations.
 large_H_spin_sparse_csr = large_H_spin_sparse.tocsr()
+
+# Summary
+# This code provides a detailed demonstration of constructing a quantum Hamiltonian matrix
+# for a small molecule, then scaling it up to a large sparse matrix.
+# The large matrix is intended for demonstration and may not accurately represent
+# a real quantum system of that size.
+# The code combines quantum chemical calculations with matrix operations
+# to model the electronic structure of a molecule.
+
 
 from scipy.sparse.linalg import eigsh
 
