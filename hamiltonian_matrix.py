@@ -1,7 +1,7 @@
-from qiskit_nature.second_q.drivers import PySCFDriver
-import torch
 from pyscf import gto, scf
 import numpy as np
+import scipy.sparse as sp
+
 
 mol = gto.M(atom=[
     ['O', (0.0, 0.0, 0.0)],          # Oxygen at origin
@@ -60,5 +60,40 @@ eigenvalues, eigenvectors = np.linalg.eigh(H_spin)
 
 # eigenvalues contains the energy levels
 # eigenvectors contains the corresponding quantum states
-print(min(eigenvalues))
+print("for the small 14x14 matrix: ", min(eigenvalues))
 
+
+
+# Convert H_spin to a sparse matrix
+H_spin_sparse = sp.csr_matrix(H_spin)
+
+size = 2**14
+
+# Create an empty sparse matrix of the desired size
+large_H_spin_sparse = sp.lil_matrix((size, size))
+
+# Calculate the number of repetitions needed
+repetitions = size // H_spin_sparse.shape[0]
+
+# Populate the large sparse matrix with the pattern from H_spin
+for i in range(repetitions):
+    for j in range(repetitions):
+        start_row = i * H_spin_sparse.shape[0]
+        start_col = j * H_spin_sparse.shape[1]
+        end_row = start_row + H_spin_sparse.shape[0]
+        end_col = start_col + H_spin_sparse.shape[1]
+        large_H_spin_sparse[start_row:end_row, start_col:end_col] = H_spin_sparse
+
+# Convert to CSR format for efficient arithmetic and matrix-vector operations
+large_H_spin_sparse_csr = large_H_spin_sparse.tocsr()
+
+from scipy.sparse.linalg import eigsh
+
+# Assuming large_H_spin_sparse_csr is your large sparse Hamiltonian matrix
+# Find the smallest eigenvalue
+# 'which='SA'' means to find the smallest algebraic eigenvalue
+eigenvalues, eigenvectors = eigsh(large_H_spin_sparse_csr, k=1, which='SA')
+
+# Extract the smallest eigenvalue
+smallest_eigenvalue = eigenvalues[0]
+print("Smallest eigenvalue: for the large 2^14x2^14 matrix: ", smallest_eigenvalue)

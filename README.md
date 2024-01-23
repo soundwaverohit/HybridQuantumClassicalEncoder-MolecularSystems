@@ -6,6 +6,12 @@
 - Have the hamiltonian to find the correct ground state with the correct parameters and the quantum encoder version to find the difference 
 
 
+## Repo Information
+- The classical encoder, quantum circuit, and decoder are outlined in the files
+- The learning.py file contains the training loop to run the hybrid model
+- The auto_encoder_notebook will contain the pipeline experimentation before the changes are made to the above files
+
+
 ## Proposed packages for pipeline: 
 - Qiskit for Quantum Circuits
 - Pytorch for the Neural Networks
