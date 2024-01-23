@@ -5,7 +5,7 @@ import numpy as np
 from classical_encoder import ClassicalEncoder
 from classical_decoder import ClassicalDecoder
 from QuantumCircuit import run_quantum_circuit
-from hamiltonian_matrix import H_spin
+from hamiltonian_matrix import H_spin, eigenvalues
 
 
 class HybridModel(nn.Module):
@@ -89,3 +89,11 @@ for epoch in range(num_epochs):
     optimizer.step()                 # Update parameters
     loss_values.append(loss.item())  # Store loss for plotting
     print(f"Epoch {epoch+1}/{num_epochs}, Loss: {loss.item()}")
+
+
+def diff_calculator(true,network_energy):
+    value = abs(true- network_energy)/ abs(true)
+    return value
+
+
+print("Energy difference in percentage : ", diff_calculator(min(eigenvalues), loss_values[199]))

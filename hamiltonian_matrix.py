@@ -61,3 +61,4 @@ eigenvalues, eigenvectors = np.linalg.eigh(H_spin)
 # eigenvalues contains the energy levels
 # eigenvectors contains the corresponding quantum states
 print(min(eigenvalues))
+
