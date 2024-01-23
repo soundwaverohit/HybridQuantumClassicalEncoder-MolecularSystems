@@ -15,7 +15,7 @@ class ClassicalDecoder(nn.Module):
             nn.ReLU(),
             nn.Linear(64, 32),  # Fourth layer reducing from 32 to 16 outputs
             nn.ReLU(),          # Activation function
-            nn.Linear(32, 14)
+            nn.Linear(32, 16384)
         )
     
     def forward(self, x):

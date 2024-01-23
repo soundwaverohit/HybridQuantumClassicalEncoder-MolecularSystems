@@ -7,7 +7,7 @@ class ClassicalEncoder(nn.Module):
     def __init__(self):
         super(ClassicalEncoder, self).__init__()
         self.fc = nn.Sequential(
-            nn.Linear(14, 28),  # First layer with 7 inputs and 14 outputs
+            nn.Linear(16384, 28),  # First layer with 7 inputs and 14 outputs
             nn.ReLU(),         # Activation function
             nn.Linear(28, 56), # Second layer with 14 inputs and 28 outputs
             nn.ReLU(),         # Activation function
