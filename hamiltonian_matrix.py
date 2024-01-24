@@ -1,6 +1,8 @@
 from pyscf import gto, scf
 import numpy as np
 import scipy.sparse as sp
+import scipy.linalg as la
+import scipy.sparse as sp
 
 # Step 1: Define the Molecular System
 # A water molecule is defined using PySCF's `gto.M` function.
@@ -63,21 +65,21 @@ H_spin_sparse = sp.csr_matrix(H_spin)
 # A much larger sparse matrix (`large_H_spin_sparse`) is created.
 size = 2**14
 large_H_spin_sparse = sp.lil_matrix((size, size))
+# Convert H_spin to a sparse matrix
+H_spin_sparse = sp.csr_matrix(H_spin)
 
-# Calculate the number of repetitions needed.
-repetitions = size // H_spin_sparse.shape[0]
+size = 2**14
 
-# Populate the large sparse matrix with the pattern from `H_spin_sparse`.
-for i in range(repetitions):
-    for j in range(repetitions):
-        start_row = i * H_spin_sparse.shape[0]
-        start_col = j * H_spin_sparse.shape[1]
-        end_row = start_row + H_spin_sparse.shape[0]
-        end_col = start_col + H_spin_sparse.shape[1]
-        large_H_spin_sparse[start_row:end_row, start_col:end_col] = H_spin_sparse
+num_repetitions = size // H_spin.shape[0]
 
-# Convert to CSR format for efficient arithmetic and matrix-vector operations.
-large_H_spin_sparse_csr = large_H_spin_sparse.tocsr()
+# Create a list of H_spin matrices
+H_spin_blocks = [H_spin] * num_repetitions
+
+# Create the block diagonal matrix
+large_H_spin_block = la.block_diag(*H_spin_blocks)
+
+# Convert to a sparse matrix
+large_H_spin_sparse_csr = sp.csr_matrix(large_H_spin_block)
 
 # Summary
 # This code provides a detailed demonstration of constructing a quantum Hamiltonian matrix

@@ -86,7 +86,7 @@ def energy_expectation(output, hamiltonian):
 
 
 # Sample input
-input_data = torch.rand(16384, requires_grad=True)  # Example input
+input_data = torch.rand(16380, requires_grad=True)  # Example input
 #input_data= torch.tensor([ 0.3679, -0.0602,  0.6200,  0.1083, -0.0054,  0.0107,  0.1241, 0.3679, -0.0602,  0.6200,  0.1083, -0.0054,  0.0107,  0.1241])
 
 # Optimization setup
