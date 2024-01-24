@@ -2,8 +2,8 @@
 
 
 #### TODO
-- Look at the correct hamiltonian coefficient changes and where to implement them 
-- Have the hamiltonian to find the correct ground state with the correct parameters and the quantum encoder version to find the difference 
+- Get the hamiltonian matrix correct for the water molecule and getting the correct energy values
+- Get research insight into why the model is performing well
 
 
 ## Repo Information

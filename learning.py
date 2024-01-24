@@ -4,12 +4,22 @@ import torch.optim as optim
 import numpy as np
 from classical_encoder import ClassicalEncoder
 from classical_decoder import ClassicalDecoder
-from QuantumCircuit import run_quantum_circuit
+from QuantumCircuit import run_quantum_circuit, run_quantum_circuit_and_calculate_expectation_values
 from hamiltonian_matrix import large_H_spin_sparse_csr, smallest_eigenvalue
 #from pyscf import gto, scf
 import pandas as pd 
 import os 
 import csv
+import argparse
+
+
+parser = argparse.ArgumentParser(description='Train a QuantumModel with custom parameters.')
+parser.add_argument('--model_name', type=str, default='model1', help='Name of the model to save')
+args = parser.parse_args()
+
+
+model_name = args.model_name
+print("Model Name: ", model_name)
 
 
 class HybridModel(nn.Module):
@@ -17,7 +27,7 @@ class HybridModel(nn.Module):
         super(HybridModel, self).__init__()
         self.encoder = ClassicalEncoder()
         self.decoder = ClassicalDecoder()
-        self.qcircuit = run_quantum_circuit
+        self.qcircuit = run_quantum_circuit #run_quantum_circuit_and_calculate_expectation_values
 
     def forward(self, x):
         encoded = self.encoder(x)
@@ -118,7 +128,7 @@ for epoch in range(num_epochs):
 
 
 def diff_calculator(true,network_energy):
-    value = abs(true- network_energy)/ abs(true)
+    value = abs(true- network_energy)
     return value
 
 
@@ -140,8 +150,8 @@ def name_generator(time):
 true_energy= smallest_eigenvalue
 Experiment_run= loss_values[99]
 # CSV Logging
-log_fields = ['Experiment_run', 'true_energy', 'hybrid_model_energy']
-log_data = [name_generator(len(df)), true_energy, loss_values[99]]
+log_fields = ['Experiment_run', 'true_energy', 'hybrid_model_energy', "difference"]
+log_data = [model_name, true_energy, loss_values[99],diff_calculator(smallest_eigenvalue, loss_values[99])]
 
 # Check if file exists
 file_exists = os.path.isfile('experiment_results.csv')
