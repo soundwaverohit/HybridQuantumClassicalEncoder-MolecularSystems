@@ -6,6 +6,12 @@
 - Get research insight into why the model is performing well
 
 
+## Instructions on running:
+- hamiltonian_matrix.py contains the hamiltonian matrix of the water molecule
+- Adjust the nueral network parameters and layers in the classical_encoder.py and classical_decoder.py 
+- Run the model on learning.py and see the result of the model in the experiment_results.csv file in the last row which containts the true energy, approximated energy by the model and the energy difference.
+- The hybrid_autoencoder_pipelinetests.ipynb contains the entire pipeline with a loss function plot as well.
+
 ## Repo Information
 - The classical encoder, quantum circuit, and decoder are outlined in the files
 - The learning.py file contains the training loop to run the hybrid model
