@@ -87,3 +87,4 @@ hamiltonian_matrix= torch.tensor(hamiltonian_matrix)
 print(hamiltonian_matrix)
 print(len(hamiltonian_matrix))
 
+print("The ground state of the SYK Hamiltonian is: ", gs_energy(hamiltonian_matrix)[0])
