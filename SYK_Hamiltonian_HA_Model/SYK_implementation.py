@@ -17,15 +17,23 @@ from openfermion.ops import MajoranaOperator
 from openfermion.transforms import jordan_wigner
 from openfermion.linalg import get_sparse_operator
 from itertools import combinations
+import os 
+import csv
 warnings.filterwarnings('ignore')
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-N", type=int, default=4, help="Number of fermions")
+parser.add_argument('--model_name', type=str, default='model1', help='Name of the model to save')
+parser.add_argument("-N", type=int, default=8, help="Number of fermions")
+
 args = parser.parse_args()
 N=args.N
 seed= 0
 mu= 0.01
+args = parser.parse_args()
 
+
+model_name = args.model_name
+print("Model Name: ", model_name)
 
 
 def factorial(n):
@@ -128,36 +136,10 @@ def run_quantum_circuit(params):
     qc = QuantumCircuit(4, 4)
 
     for i in range(4):
-        qc.ry(theta[i], i)
+        #qc.ry(theta[i], i)
         qc.rx(theta[i], i)
 
-    qc.cnot(3, 0)
-    qc.cnot(1, 0)
-    qc.cnot(2, 1)
-    qc.cnot(3, 2)
-    qc.barrier()
-
-    for i in range(4):
-        qc.rx(theta[i], i)
-        qc.ry(theta[i], i)
-        qc.rx(theta[i], i)
-
-    qc.cnot(3,0)
-    qc.cnot(1,0)
-    qc.cnot(2,1)
-    qc.cnot(3,2)
-
-    qc.barrier()
-
-    for i in range(4):
-        qc.rx(theta[i], i)
-        qc.ry(theta[i], i)
-        qc.rx(theta[i], i)
-
-    qc.cnot(3,0)
-    qc.cnot(1,0)
-    qc.cnot(2,1)
-    qc.cnot(3,2)
+    
 
     qc.barrier()
     
@@ -309,4 +291,31 @@ plt.axhline(y=lowest_eigenvalue, color='r', linestyle='--')
 plt.xlabel('Epoch')
 plt.ylabel('Loss')
 plt.title('Training Loss Over Time for N=8')
-plt.savefig("SYK_plot")
+plt.savefig("SYK_Hamiltonian_HA_Model/SYK_plot")
+
+
+df = pd.read_csv("SYK_Hamiltonian_HA_Model/SYK_results.csv")
+
+
+def name_generator(time):
+    string= "experiment_number_"
+    string= string+ str(time)
+    return string
+
+
+
+true_energy= lowest_eigenvalue
+Experiment_run= loss_values[len(loss_values)-1]
+# CSV Logging
+log_fields = ['Experiment_run', 'true_energy', 'hybrid_model_energy', "difference"]
+log_data = [name_generator(len(df)), true_energy, loss_values[99],diff_calculator(lowest_eigenvalue, loss_values[len(loss_values)-1])]
+
+# Check if file exists
+file_exists = os.path.isfile('SYK_Hamiltonian_HA_Model/SYK_results.csv')
+
+# Write to CSV
+with open('SYK_Hamiltonian_HA_Model/SYK_results.csv', 'a', newline='') as csvfile:
+    writer = csv.DictWriter(csvfile, fieldnames=log_fields)
+    if not file_exists:
+        writer.writeheader()
+    writer.writerow({field: data for field, data in zip(log_fields, log_data)})

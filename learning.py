@@ -151,7 +151,7 @@ true_energy= smallest_eigenvalue
 Experiment_run= loss_values[99]
 # CSV Logging
 log_fields = ['Experiment_run', 'true_energy', 'hybrid_model_energy', "difference"]
-log_data = [model_name, true_energy, loss_values[99],diff_calculator(smallest_eigenvalue, loss_values[99])]
+log_data = [name_generator(len(df)), true_energy, loss_values[99],diff_calculator(smallest_eigenvalue, loss_values[99])]
 
 # Check if file exists
 file_exists = os.path.isfile('experiment_results.csv')
