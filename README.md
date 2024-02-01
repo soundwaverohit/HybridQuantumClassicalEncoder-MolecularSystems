@@ -2,8 +2,7 @@
 
 
 #### TODO
-- Get the hamiltonian matrix correct for the water molecule and getting the correct energy values
-- Get research insight into why the model is performing well
+- Implement the HA model from the anamoly detection paper.
 
 
 ## Instructions on running:
@@ -16,7 +15,7 @@
 - The classical encoder, quantum circuit, and decoder are outlined in the files
 - The learning.py file contains the training loop to run the hybrid model
 - The auto_encoder_notebook will contain the pipeline experimentation before the changes are made to the above files
-
+- The SYK Model hamiltonian is in the SYK hamiltonian folder
 
 ## Proposed packages for pipeline: 
 - Qiskit for Quantum Circuits
