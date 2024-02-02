@@ -146,13 +146,13 @@ def run_vqe(hamiltonian, num_qubits, depth, num_steps):
     return result
 
 # Example usage
-num_qubits = 8  # Number of qubits
-depth = 3       # Depth of the variational circuit
-num_steps = 100 # Number of optimization steps
+num_qubits = 1  # Number of qubits
+depth = 1      # Depth of the variational circuit
+num_steps = 1 # Number of optimization steps
 
 # Construct Hamiltonian (example: H = X⊗X + Y⊗Y + Z⊗Z)
 #path for mac: "/Users/rohitganti/Desktop/HybridQuantumClassicalEncoder-MolecularSystems/SYK_Hamiltonian_HA_Model/SYK_Implementation_of_TFD_VQE/data/SYK_ham_8_0_0.01.txt"
-syk_ham= read_hamiltonian("data/SYK_ham_8_0_0.01.txt", 8)
+syk_ham= read_hamiltonian("/Users/rohitganti/Desktop/HybridQuantumClassicalEncoder-MolecularSystems/SYK_Hamiltonian_HA_Model/SYK_Implementation_of_TFD_VQE/data/SYK_ham_8_0_0.01.txt", 8)
 hamiltonian = (X^X) + (Y^Y) + (Z^Z)
 
 result = run_vqe(syk_ham, num_qubits, depth, num_steps)

@@ -23,7 +23,7 @@ warnings.filterwarnings('ignore')
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--model_name', type=str, default='model1', help='Name of the model to save')
-parser.add_argument("-N", type=int, default=8, help="Number of fermions")
+parser.add_argument("-N", type=int, default=5, help="Number of fermions")
 
 args = parser.parse_args()
 N=args.N
@@ -307,8 +307,8 @@ def name_generator(time):
 true_energy= lowest_eigenvalue
 Experiment_run= loss_values[len(loss_values)-1]
 # CSV Logging
-log_fields = ['Experiment_run', 'true_energy', 'hybrid_model_energy', "difference"]
-log_data = [name_generator(len(df)), true_energy, loss_values[99],diff_calculator(lowest_eigenvalue, loss_values[len(loss_values)-1])]
+log_fields = ['Experiment_run', 'true_energy', 'hybrid_model_energy', "difference", "SYK_N_Value"]
+log_data = [name_generator(len(df)), true_energy, loss_values[99],diff_calculator(lowest_eigenvalue, loss_values[len(loss_values)-1]), N]
 
 # Check if file exists
 file_exists = os.path.isfile('SYK_Hamiltonian_HA_Model/SYK_results.csv')
