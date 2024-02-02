@@ -23,7 +23,7 @@ warnings.filterwarnings('ignore')
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--model_name', type=str, default='model1', help='Name of the model to save')
-parser.add_argument("-N", type=int, default=5, help="Number of fermions")
+parser.add_argument("-N", type=int, default=8, help="Number of fermions")
 
 args = parser.parse_args()
 N=args.N
@@ -113,15 +113,15 @@ class ClassicalEncoder(nn.Module):
     def __init__(self):
         super(ClassicalEncoder, self).__init__()
         self.fc = nn.Sequential(
-            nn.Linear(len(hamiltonian_matrix), 8),  # First layer with 7 inputs and 14 outputs
+            nn.Linear(len(hamiltonian_matrix), 128),  # First layer with 7 inputs and 14 outputs
             nn.ReLU(),         # Activation function
-            #nn.Linear(28, 56), # Second layer with 14 inputs and 28 outputs
-            #nn.ReLU(),         # Activation function
-            #nn.Linear(56, 28), # Third layer with 28 inputs and 56 outputs
-            #nn.ReLU(),         # Activation function
-            #nn.Linear(28, 14), # Fourth layer reducing from 56 to 28 outputs
-            #nn.ReLU(),         # Activation function
-            nn.Linear(8, 4) # Fifth layer reducing from 28 to 14 outputs
+            nn.Linear(128, 56), # Second layer with 14 inputs and 28 outputs
+            nn.ReLU(),         # Activation function
+            nn.Linear(56, 28), # Third layer with 28 inputs and 56 outputs
+            nn.ReLU(),         # Activation function
+            nn.Linear(28, 14), # Fourth layer reducing from 56 to 28 outputs
+            nn.ReLU(),         # Activation function
+            nn.Linear(14, 4) # Fifth layer reducing from 28 to 14 outputs
         )
     
     def forward(self, x):
@@ -176,16 +176,16 @@ class ClassicalDecoder(nn.Module):
         super(ClassicalDecoder, self).__init__()
         self.fc = nn.Sequential(
             nn.Linear(4, 8),    # First layer with 4 inputs and 8 outputs
-            #nn.ReLU(),          # Activation function
-            #nn.Linear(8, 16),   # Second layer with 8 inputs and 16 outputs
-            #nn.ReLU(),          # Activation function
-            #nn.Linear(16, 32),  # Third layer with 16 inputs and 32 outputs
-            #nn.ReLU(),          # Activation function
-            #nn.Linear(32, 64),
-            #nn.ReLU(),
-            #nn.Linear(64, 32),  # Fourth layer reducing from 32 to 16 outputs
             nn.ReLU(),          # Activation function
-            nn.Linear(8, len(hamiltonian_matrix))
+            nn.Linear(8, 16),   # Second layer with 8 inputs and 16 outputs
+            nn.ReLU(),          # Activation function
+            nn.Linear(16, 32),  # Third layer with 16 inputs and 32 outputs
+            nn.ReLU(),          # Activation function
+            nn.Linear(32, 64),
+            nn.ReLU(),
+            nn.Linear(64, 128),  # Fourth layer reducing from 32 to 16 outputs
+            nn.ReLU(),          # Activation function
+            nn.Linear(128, len(hamiltonian_matrix))
         )
     
     def forward(self, x):
@@ -214,7 +214,6 @@ model = HybridModel()
 
 
 def energy_expectation(output, hamiltonian):
-    # ... [previous code] ...
 
     # Convert hamiltonian to double
     hamiltonian = hamiltonian.type(torch.double)

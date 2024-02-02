@@ -8,9 +8,22 @@ import cirq
 from openfermion.ops import MajoranaOperator
 from openfermion.transforms import jordan_wigner
 from openfermion.linalg import get_sparse_operator
+from qiskit.circuit import Parameter
 
 import torch 
+import pybobyqa
 
+
+import numpy as np
+from qiskit import Aer
+from qiskit.utils import QuantumInstance
+from qiskit.circuit import QuantumCircuit, ParameterVector
+from qiskit.algorithms import VQE, NumPyMinimumEigensolver
+from qiskit.algorithms.optimizers import SPSA, ADAM
+from qiskit.opflow import MatrixOp
+import warnings
+
+warnings.filterwarnings('ignore')
 
 def factorial(n):
     if n == 1:
@@ -82,15 +95,67 @@ N=8
 seed= 0
 mu= 0.01
 hamiltonian_matrix = main(N,seed, mu)
-hamiltonian_matrix= torch.tensor(hamiltonian_matrix)
-
-print(hamiltonian_matrix)
+#hamiltonian_matrix= torch.tensor(hamiltonian_matrix)
 print(len(hamiltonian_matrix))
 
-print("The ground state of the SYK Hamiltonian is: ", gs_energy(hamiltonian_matrix)[0])
+
+
+# Convert the dense Hamiltonian matrix to a suitable operator for VQE
+hamiltonian_operator = MatrixOp(hamiltonian_matrix)
+
+# Define a simple parameterized circuit as the ansatz
+def create_ansatz(num_qubits):
+    params = ParameterVector('θ', length=num_qubits * 3)
+    qc = QuantumCircuit(num_qubits)
+    for i in range(num_qubits):
+        qc.rz(params[i], i)
+        qc.rx(params[i], i)
+        qc.rz(params[i], i)
+
+    qc.cnot(0,1)
+    qc.cnot(1,2)
+    qc.cnot(2,3)
+    #qc.cnot(3,4)
+    #qc.cnot(4,5)
+    #qc.cnot(5,6)
+    #qc.cnot(6,7)
+    #qc.cnot(7,0)
+
+
+    #qc.barrier()
+  
+
+    return qc, params
+
+num_qubits = int(np.log2(hamiltonian_matrix.shape[0]))
+print("number of qubits: ", num_qubits)
+
+ansatz, parameters = create_ansatz(num_qubits)
+
+# Draw the circuit
+ansatz.draw('mpl')
 
 
 
+# Use SPSA optimizer, it's suitable for noisy optimization like on a real quantum device
+optimizer = SPSA(maxiter=200)
 
+# Setup quantum instance to use the statevector simulator
+quantum_instance = QuantumInstance(Aer.get_backend('aer_simulator_statevector'))
 
+# Initialize VQE with the ansatz, optimizer, and the quantum instance
+vqe = VQE(ansatz=ansatz, optimizer=optimizer, quantum_instance=quantum_instance)
+
+# Run VQE to find the lowest eigenvalue of the Hamiltonian
+vqe_result = vqe.compute_minimum_eigenvalue(operator=hamiltonian_operator)
+
+# Extract the lowest eigenvalue
+lowest_eigenvalue = np.real(vqe_result.eigenvalue)
+print("The VQE given lowest eigenvalue is: ", lowest_eigenvalue)
+
+# Compare to exact solver
+exact_solver = NumPyMinimumEigensolver()
+exact_result = exact_solver.compute_minimum_eigenvalue(operator=hamiltonian_operator)
+
+print('Exact Solver Result:', exact_result.eigenvalue.real)
 
