@@ -8,20 +8,19 @@ import cirq
 from openfermion.ops import MajoranaOperator
 from openfermion.transforms import jordan_wigner
 from openfermion.linalg import get_sparse_operator
-from qiskit.circuit import Parameter
 
 import torch 
-import pybobyqa
-
 
 import numpy as np
 from qiskit import Aer
 from qiskit.utils import QuantumInstance
-from qiskit.circuit import QuantumCircuit, ParameterVector
+from qiskit.circuit import QuantumCircuit, ParameterVector, Parameter
 from qiskit.algorithms import VQE, NumPyMinimumEigensolver
 from qiskit.algorithms.optimizers import SPSA, ADAM
 from qiskit.opflow import MatrixOp
 import warnings
+from qiskit.circuit.library import RZGate, RXGate, RXXGate
+from math import pi
 
 warnings.filterwarnings('ignore')
 
@@ -96,6 +95,7 @@ seed= 0
 mu= 0.01
 hamiltonian_matrix = main(N,seed, mu)
 #hamiltonian_matrix= torch.tensor(hamiltonian_matrix)
+
 print(len(hamiltonian_matrix))
 
 
@@ -103,42 +103,73 @@ print(len(hamiltonian_matrix))
 # Convert the dense Hamiltonian matrix to a suitable operator for VQE
 hamiltonian_operator = MatrixOp(hamiltonian_matrix)
 
+
 # Define a simple parameterized circuit as the ansatz
 def create_ansatz(num_qubits):
-    params = ParameterVector('θ', length=num_qubits * 3)
+    num_params_per_layer = 3 * num_qubits + num_qubits // 2
+    total_params = 4 * num_params_per_layer
+    params = [Parameter(f'θ{i}') for i in range(total_params)]#ParameterVector('θ', length=num_qubits)
     qc = QuantumCircuit(num_qubits)
-    for i in range(num_qubits):
-        qc.rz(params[i], i)
-        qc.rx(params[i], i)
-        qc.rz(params[i], i)
 
-    qc.cnot(0,1)
-    qc.cnot(1,2)
-    qc.cnot(2,3)
-    #qc.cnot(3,4)
-    #qc.cnot(4,5)
-    #qc.cnot(5,6)
-    #qc.cnot(6,7)
-    #qc.cnot(7,0)
+    d = 4  # replace with desired depth
+    n = 8
 
+    param_idx = 0
 
-    #qc.barrier()
-  
+    for layer in range(d):
+        for qubit in range(num_qubits):
+            # Apply RZ, RX, RZ with unique parameters
+            qc.rz(params[param_idx], qubit)
+            param_idx += 1
+            qc.rx(params[param_idx], qubit)
+            param_idx += 1
+            qc.rz(params[param_idx], qubit)
+            param_idx += 1
+        
+        # Apply RXX gates with unique parameters
+        for qubit in range(0, num_qubits, 2):
+            qc.rxx(params[param_idx], qubit, qubit + 1)
+            param_idx += 1
 
     return qc, params
 
-num_qubits = int(np.log2(hamiltonian_matrix.shape[0]))
-print("number of qubits: ", num_qubits)
 
+"""
+
+def create_ansatz(num_qubits):
+    depth=4
+    # Each layer has 3 rotations per qubit and half the number of qubits RXX gates
+    num_params_per_rotation_layer = 3 * num_qubits
+    num_params_per_rxx_layer = num_qubits // 2
+    num_params_per_layer = num_params_per_rotation_layer + num_params_per_rxx_layer
+    total_params = depth * num_params_per_layer
+
+    # Create a list of parameters
+    params = [Parameter(f'θ{i}') for i in range(total_params)]
+    qc = QuantumCircuit(num_qubits)
+
+    # Assign parameters layer by layer
+    for layer in range(depth):
+        # Assign parameters for rotation gates
+        for qubit in range(num_qubits):
+            param_idx = layer * num_params_per_layer + qubit * 3
+            qc.rz(params[param_idx], qubit)
+            qc.rx(params[param_idx + 1], qubit)
+            qc.rz(params[param_idx + 2], qubit)
+
+        # Assign parameters for RXX gates in the layer
+        for qubit in range(0, num_qubits, 2):
+            param_idx = layer * num_params_per_layer + num_params_per_rotation_layer + qubit // 2
+            qc.rxx(params[param_idx], qubit, qubit + 1)
+
+    return qc, params
+"""
+
+num_qubits = int(np.log2(hamiltonian_matrix.shape[0]))
 ansatz, parameters = create_ansatz(num_qubits)
 
-# Draw the circuit
-ansatz.draw('mpl')
-
-
-
 # Use SPSA optimizer, it's suitable for noisy optimization like on a real quantum device
-optimizer = SPSA(maxiter=200)
+optimizer = SPSA(maxiter=1000)
 
 # Setup quantum instance to use the statevector simulator
 quantum_instance = QuantumInstance(Aer.get_backend('aer_simulator_statevector'))
@@ -158,4 +189,3 @@ exact_solver = NumPyMinimumEigensolver()
 exact_result = exact_solver.compute_minimum_eigenvalue(operator=hamiltonian_operator)
 
 print('Exact Solver Result:', exact_result.eigenvalue.real)
-
