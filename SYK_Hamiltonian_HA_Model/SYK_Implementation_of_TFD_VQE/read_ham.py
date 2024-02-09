@@ -142,7 +142,7 @@ def run_vqe(hamiltonian, num_qubits, depth, num_steps):
     circuit, params = create_variational_circuit(num_qubits, depth)
     initial_params = np.random.rand(len(params))
     result = minimize(objective_function, initial_params, args=(circuit, hamiltonian, params),
-                      method='COBYLA', options={'maxiter': num_steps})
+                      method='ADAM', options={'maxiter': num_steps})
     return result
 
 # Example usage
