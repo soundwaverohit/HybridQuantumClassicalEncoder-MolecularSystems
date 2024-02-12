@@ -70,6 +70,7 @@ module read_ham
         ham_fname= "/Users/rohitganti/Desktop/HybridQuantumClassicalEncoder-MolecularSystems/SYK_Hamiltonian_HA_Model/SYK_Implementation_of_TFD_VQE/data/SYK_ham_$(N)_$(seed)_$(@sprintf("%.2f", mu)).txt"
         h_syk, h_int, SYK_energies = read_hamiltonian(ham_fname, N)
         h = h_syk + h_int
+        println("$d")
 
         circuit = dispatch!(variational_circuit(N, d, pair_ring(N), entangler=ent), :zero)
         params = parameters(circuit)
