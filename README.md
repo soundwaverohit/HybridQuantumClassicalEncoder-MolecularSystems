@@ -2,7 +2,8 @@
 
 
 #### TODO
-- Implement the HA model from the anamoly detection paper.
+- Review the parameter spaces problem
+- Implement the unified hybrid model to account the optimizer parameters from both the wavefunction and hilbert spaces
 
 
 ## Instructions on running:
