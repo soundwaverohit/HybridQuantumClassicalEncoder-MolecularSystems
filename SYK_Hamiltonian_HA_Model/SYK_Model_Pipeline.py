@@ -34,7 +34,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--model_name', type=str, default='model1', help='Name of the model to save')
 parser.add_argument("--N", type=int, default=8, help="Number of fermions")
 parser.add_argument("--qubits", type=int, default=4, help="enter number of qubits")
-parser.add_argument("--depth", type=int, default=1, help="depth of quantum circuit")
+parser.add_argument("--depth", type=int, default=2, help="depth of quantum circuit")
 
 args = parser.parse_args()
 N=args.N
@@ -339,7 +339,7 @@ for name, layer in model.named_modules():
 
 
 # Sample input
-input_data = torch.rand(256, requires_grad=True)  # Example input
+input_data = torch.rand(len(hamiltonian_matrix), requires_grad=True)  # Example input
 #input_data= torch.tensor([ 0.3679, -0.0602,  0.6200,  0.1083, -0.0054,  0.0107,  0.1241, 0.3679, -0.0602,  0.6200,  0.1083, -0.0054,  0.0107,  0.1241])
 
 # Optimization setup
