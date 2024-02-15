@@ -13,6 +13,8 @@ from scipy.sparse.linalg import eigsh,eigs
 import scipy.linalg as la
 import scipy.sparse as sp
 import cirq
+from qiskit import QuantumCircuit, Aer, execute, transpile
+
 from openfermion.ops import MajoranaOperator
 from openfermion.transforms import jordan_wigner
 from openfermion.linalg import get_sparse_operator
@@ -121,7 +123,7 @@ class ClassicalEncoder(nn.Module):
             nn.ReLU(),         # Activation function
             nn.Linear(28, 14), # Fourth layer reducing from 56 to 28 outputs
             nn.ReLU(),         # Activation function
-            nn.Linear(14, 4) # Fifth layer reducing from 28 to 14 outputs
+            nn.Linear(14, 8) # Fifth layer reducing from 28 to 14 outputs
         )
     
     def forward(self, x):
@@ -131,13 +133,33 @@ encoder = ClassicalEncoder()
 #print("The encoder is: ", encoder)
 
 # Define a function to execute the quantum circuit
-def run_quantum_circuit(params):
-    theta = [Parameter(f'θ{i}') for i in range(4)]
-    qc = QuantumCircuit(4, 4)
+def run_quantum_circuit(x):
+    
+    depth= 1
+    
+    y= x.detach().numpy()
+    num_qubits=3
+    params1 = torch.nn.Parameter(torch.rand((3 * num_qubits * depth + depth * (num_qubits - 1)), dtype=torch.float32) * 0.01) 
+    theta = [Parameter(f'θ{i}') for i in range(len(params1))]
+    
+    qc = QuantumCircuit(num_qubits, num_qubits)
+    norm = np.sqrt(np.sum(np.abs(y)**2))
+    y = y / norm
 
-    for i in range(4):
-        #qc.ry(theta[i], i)
-        qc.rx(theta[i], i)
+    qc.initialize(y,[i for i in range(num_qubits)])
+    param_counter=0
+
+    for layer in range(depth):
+        for qubit in range(num_qubits):
+            qc.rz(theta[param_counter], qubit)
+            param_counter += 1
+
+
+        for qubit in range(num_qubits):
+            qc.rxx(theta[param_counter], qubit, (qubit+1)%num_qubits)
+            param_counter +=1
+
+
 
     
 
@@ -150,18 +172,18 @@ def run_quantum_circuit(params):
 
 
     # Do not use qc.measure_all(), as we will be measuring each qubit individually
-    for i in range(4):
-        qc.measure(i, i)
+    qc.measure(range(num_qubits), range(num_qubits))
 
-    param_dict = {theta[i]: params[i].item() for i in range(4)}
-    qc_bound = qc.bind_parameters(param_dict)
-    backend = Aer.get_backend('qasm_simulator')
-    job = execute(qc_bound, backend, shots=1024)
+    param_values = [p.item() for p in params1]
+    backend=Aer.get_backend('qasm_simulator')
+    qc_bound = qc.bind_parameters({theta[i]: param_values[i] for i in range(len(params1))})
+    transpiled_circuit = transpile(qc_bound, backend)
+    job = execute(transpiled_circuit, backend, shots=2048)
     result = job.result()
-    counts = result.get_counts(qc_bound)
+    counts = result.get_counts(transpiled_circuit)
 
     expectation_values = []
-    for i in range(4):
+    for i in range(num_qubits):
         # Calculate expectation value for each qubit
         p0 = counts.get('0' * i + '0' + '0' * (3 - i), 0) / 1024
         p1 = counts.get('0' * i + '1' + '0' * (3 - i), 0) / 1024
@@ -175,7 +197,7 @@ class ClassicalDecoder(nn.Module):
     def __init__(self):
         super(ClassicalDecoder, self).__init__()
         self.fc = nn.Sequential(
-            nn.Linear(4, 8),    # First layer with 4 inputs and 8 outputs
+            nn.Linear(3, 8),    # First layer with 4 inputs and 8 outputs
             nn.ReLU(),          # Activation function
             nn.Linear(8, 16),   # Second layer with 8 inputs and 16 outputs
             nn.ReLU(),          # Activation function
