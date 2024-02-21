@@ -137,17 +137,17 @@ class ClassicalEncoder(nn.Module):
             #nn.ReLU(),
             #nn.Linear(512, 256),
             #nn.ReLU(),
-            nn.Linear(len(hamiltonian_matrix), 128),  # First layer with 7 inputs and 14 outputs
-            nn.ReLU(),         # Activation function
-            nn.Linear(128, 64), # Second layer with 14 inputs and 28 outputs
-            nn.ReLU(),         # Activation function
-            nn.Linear(64, 32), # Third layer with 28 inputs and 56 outputs
-            nn.ReLU(),         # Activation function
-            nn.Linear(32,16),
-            #nn.ReLU(),
-            #nn.Linear(16, 8), # Fourth layer reducing from 56 to 28 outputs
+            nn.Linear(len(hamiltonian_matrix), 128).to(torch.complex128),  # First layer with 7 inputs and 14 outputs
             #nn.ReLU(),         # Activation function
-            #nn.Linear(8, 4), # Fifth layer reducing from 28 to 14 outputs
+            nn.Linear(128, 64).to(torch.complex128), # Second layer with 14 inputs and 28 outputs
+            #nn.ReLU(),         # Activation function
+            nn.Linear(64, 32).to(torch.complex128), # Third layer with 28 inputs and 56 outputs
+            #nn.ReLU(),         # Activation function
+            nn.Linear(32,16).to(torch.complex128),
+            #nn.ReLU(),
+            #nn.Linear(16, 8).to(torch.complex128), # Fourth layer reducing from 56 to 28 outputs
+            #nn.ReLU(),         # Activation function
+            #nn.Linear(8, 4).to(torch.complex128), # Fifth layer reducing from 28 to 14 outputs
             #nn.ReLU(),
             #nn.Linear(4,1)
         )
@@ -233,7 +233,7 @@ class QuantumCircuitModule:
         # Convert the most common bitstring to numpy array and then to PyTorch tensor
         output_bitstring = max(counts, key=counts.get)
         output_data = np.array([int(bit) for bit in output_bitstring[::-1]])  # Reverse to match qubit ordering
-        output_tensor = torch.tensor(output_data, dtype=torch.float32)
+        output_tensor = torch.tensor(output_data, dtype=torch.complex128)
         #print(torch.tensor(expectation_values, dtype=torch.float32))
         #print(output_tensor)
 
@@ -251,17 +251,17 @@ class ClassicalDecoder(nn.Module):
             #nn.ReLU(),          # Activation function
             #nn.Linear(8, 4),   # Second layer with 8 inputs and 16 outputs
             #nn.ReLU(),          # Activation function
-            nn.Linear(4, 1),  # Third layer with 16 inputs and 32 outputs
+            nn.Linear(4, 8).to(torch.complex128),  # Third layer with 16 inputs and 32 outputs
             #nn.ReLU(),          # Activation function
-            #nn.Linear(32, 64),
+            nn.Linear(8, 16).to(torch.complex128),
             #nn.ReLU(),
-            #nn.Linear(64, 128),  # Fourth layer reducing from 32 to 16 outputs
+            nn.Linear(16, 32).to(torch.complex128),  # Fourth layer reducing from 32 to 16 outputs
             #nn.ReLU(),          # Activation function
-            #nn.Linear(128, 256),
+            nn.Linear(32, 64).to(torch.complex128),
             #nn.ReLU(),
-            #nn.Linear(256, 512),
+            nn.Linear(64, 128).to(torch.complex128),
             #nn.ReLU(),
-            #nn.Linear(512, 1024),
+            nn.Linear(128, len(hamiltonian_matrix)).to(torch.complex128),
             #nn.ReLU(),
             #nn.Linear(1024, 2048),
             #nn.ReLU(),
@@ -300,46 +300,37 @@ def find_lowest_eigenvalue(matrix):
 lowest_eigenvalue = find_lowest_eigenvalue(hamiltonian_matrix)
 
 
+def energy_expectation(output, hamiltonian):
 
-def energy_expectation(output, hamiltonian_matrix, lowest_eigenvalue):
-    # Ensure 'output' is a column vector if it's not already
-    output_vec = hamiltonian_matrix.unsqueeze(1)  # Reshape from [256] to [256, 1] if necessary
-    
-    # Perform matrix multiplication
-    # First, multiply hamiltonian_matrix by output_vec: [256, 256] x [256, 1] -> [256, 1]
-    #temp_result = torch.matmul(hamiltonian_matrix, output_vec)
-    
-    # Then, transpose output to a row vector and multiply: [1, 256] x [256, 1] -> [1, 1]
-    #energy = torch.matmul(output_vec.transpose(-1, 0), temp_result)
-    #eigenvalues, _ = la.eigh(hamiltonian_matrix, eigvals=(0, 0))
-    
-    # Assuming you have a target energy value for comparison
-    target_energy = torch.tensor(lowest_eigenvalue)  # Ensure this matches your actual target
-    loss = (output - target_energy).pow(2).mean()  # Mean squared error
-    
-    return loss
+    # Convert hamiltonian to double
+    hamiltonian = hamiltonian.type(torch.complex128)
+
+    # Convert output to double
+    wavefunction = output.type(torch.complex128)
+
+    # Normalize the wavefunction
+    norm_wavefunction = wavefunction / torch.sqrt(torch.sum(torch.abs(wavefunction)**2))
+
+    # Calculate the energy expectation value
+    energy = torch.vdot(norm_wavefunction, torch.mv(hamiltonian, norm_wavefunction)).real
+
+    #eigenvalues, _ = la.eigh(hamiltonian, eigvals=(0, 0))
+
+    #val = torch.tensor(eigenvalues, requires_grad= True)
+
+    return energy
 
 
 
-def print_gradient_norm(self, grad_input, grad_output):
-    # grad_input is a tuple containing the gradients with respect to the inputs of the layer
-    # grad_output is a tuple containing the gradients with respect to the outputs of the layer
-    if grad_input is not None and grad_input[0] is not None:
-        input_norm = grad_input[0].norm()
-        #print(f'Layer: {self.__class__.__name__} | Gradient norm (input): {input_norm}')
-    if grad_output is not None and grad_output[0] is not None:
-        output_norm = grad_output[0].norm()
-        #print(f'Layer: {self.__class__.__name__} | Gradient norm (output): {output_norm}')
 
-# Register hooks on all layers of the model that have weights
-for name, layer in model.named_modules():
-    if hasattr(layer, 'weight'):
-        # Register a hook on the layer
-        layer.register_full_backward_hook(print_gradient_norm)
+
+
+
+
 
 
 # Sample input
-input_data = torch.rand(len(hamiltonian_matrix), requires_grad=True)  # Example input
+input_data = torch.rand(len(hamiltonian_matrix), requires_grad=True).type(torch.complex128) # Example input
 #input_data= torch.tensor([ 0.3679, -0.0602,  0.6200,  0.1083, -0.0054,  0.0107,  0.1241, 0.3679, -0.0602,  0.6200,  0.1083, -0.0054,  0.0107,  0.1241])
 
 # Optimization setup
@@ -364,7 +355,7 @@ for epoch in range(num_epochs):
     # Calculate the loss
     #initial_hamiltonian = hamiltonian_initial_module.mf.get_hcore()
     #final_hamiltonian = hamiltonian_final_module.mf.get_hcore()
-    loss = energy_expectation(output,hamiltonian_matrix, lowest_eigenvalue)
+    loss = energy_expectation(output,hamiltonian_matrix)
     # Check if loss requires grad
     #if not loss.requires_grad:
      #   raise RuntimeError("Loss does not require gradients. Check energy_expectation implementation.")
@@ -380,7 +371,7 @@ for epoch in range(num_epochs):
     print(f"Epoch {epoch+1}/{num_epochs}, Loss: {loss.item()}")
 
 
-final_val= float(outputs[999])
+final_val= float(energy_expectation(outputs[999], hamiltonian_matrix))
 print("Lowest Eigenvalue:", lowest_eigenvalue)
 print("Final output of the model: ", final_val) 
 print("energy difference is: ", abs(abs(lowest_eigenvalue)- abs(final_val)))

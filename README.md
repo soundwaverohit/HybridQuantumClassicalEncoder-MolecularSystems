@@ -2,8 +2,8 @@
 
 
 #### TODO
-- Review the parameter spaces problem
-- Implement the unified hybrid model to account the optimizer parameters from both the wavefunction and hilbert spaces
+- Implement a resource effecient decoder 
+- Identify quantum advantages
 
 
 ## Instructions on running:
