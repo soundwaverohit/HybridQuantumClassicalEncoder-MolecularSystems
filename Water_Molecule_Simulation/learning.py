@@ -2,10 +2,10 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
-from classical_encoder import ClassicalEncoder
-from classical_decoder import ClassicalDecoder
-from QuantumCircuit import run_quantum_circuit, run_quantum_circuit_and_calculate_expectation_values
-from hamiltonian_matrix import large_H_spin_sparse_csr, smallest_eigenvalue
+from Water_Molecule_Simulation.classical_encoder import ClassicalEncoder
+from Water_Molecule_Simulation.classical_decoder import ClassicalDecoder
+from Water_Molecule_Simulation.QuantumCircuit import run_quantum_circuit, run_quantum_circuit_and_calculate_expectation_values
+from Water_Molecule_Simulation.hamiltonian_matrix import large_H_spin_sparse_csr, smallest_eigenvalue
 #from pyscf import gto, scf
 import pandas as pd 
 import os 

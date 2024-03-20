@@ -2,11 +2,10 @@
 
 
 #### TODO
-- Implement a resource effecient decoder 
-- Identify quantum advantages
+- Implement the Heisenberg model for the area law problem in the hilbert space 
 
 
-## Instructions on running:
+## Instructions on running: (Everything is in either the SYK or Water Molecule folder)
 - hamiltonian_matrix.py contains the hamiltonian matrix of the water molecule
 - Adjust the nueral network parameters and layers in the classical_encoder.py and classical_decoder.py 
 - Run the model on learning.py and see the result of the model in the experiment_results.csv file in the last row which containts the true energy, approximated energy by the model and the energy difference.

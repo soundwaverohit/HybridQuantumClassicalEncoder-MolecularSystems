@@ -1,8 +1,8 @@
 """This is the file to execute the hybrid file"""
 import torch
-from classical_encoder import encoder
-from QuantumCircuit import run_quantum_circuit
-from classical_decoder import decoder
+from Water_Molecule_Simulation.classical_encoder import encoder
+from Water_Molecule_Simulation.QuantumCircuit import run_quantum_circuit
+from Water_Molecule_Simulation.classical_decoder import decoder
 
 #from hamiltonian_initial import inputs
 
