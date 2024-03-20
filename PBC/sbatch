@@ -1,0 +1,1 @@
+bsub -q fat144 -n 72  -o %J.log -e %J.err mpirun python Gradient_cooling.py
